@@ -77,8 +77,9 @@ public class ValueTask<T> extends Task {
 
     @Override
     public Task then(Runnable action) {
+        if (hasFailed()) return this;
 
-        if (_isCompleted) {
+        if (isDone()) {
             action.run();
             return this;
         }
@@ -90,8 +91,9 @@ public class ValueTask<T> extends Task {
 
     @Override
     public Task then(Consumer<Task> action) {
+        if (hasFailed()) return this;
 
-        if (_isCompleted) {
+        if (isDone()) {
             action.accept(this);
             return this;
         }
@@ -102,8 +104,9 @@ public class ValueTask<T> extends Task {
     }
 
     public Task then(BiConsumer<ValueTask<T>, T> action){
+        if (hasFailed()) return this;
 
-        if (_isCompleted) {
+        if (isDone()) {
             action.accept(this, _result);
             return this;
         }
@@ -116,10 +119,12 @@ public class ValueTask<T> extends Task {
     @Override
     public Task error(Consumer<Exception> action) {
 
-        if (_isCompleted && _exception != null) {
+        if (isDone() && hasFailed()) {
             action.accept(_exception);
             return this;
         }
+
+        if (isDone()) return this;
 
         _errorCallbacks.add(action);
 
@@ -128,6 +133,7 @@ public class ValueTask<T> extends Task {
 
     @Override
     public void await() {
+        if (_isCompleted) return;
         try {
             _thread.join();
         }catch (Exception error){
@@ -137,8 +143,6 @@ public class ValueTask<T> extends Task {
 
             _isWorking = false;
             _isCompleted = true;
-        }finally{
-            dispatch();
         }
     }
 

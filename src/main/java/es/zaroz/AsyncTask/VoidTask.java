@@ -69,7 +69,9 @@ public class VoidTask extends Task {
     }
 
     public Task then(Runnable action) {
-        if (_isCompleted) {
+        if (hasFailed()) return this;
+
+        if (isDone()) {
             action.run();
             return this;
         }
@@ -81,8 +83,9 @@ public class VoidTask extends Task {
 
     @Override
     public Task then(Consumer<Task> action) {
+        if (hasFailed()) return this;
 
-        if (_isCompleted) {
+        if (isDone()) {
             action.accept(this);
             return this;
         }
@@ -95,10 +98,12 @@ public class VoidTask extends Task {
     @Override
     public Task error(Consumer<Exception> action) {
 
-        if (_isCompleted && _exception != null) {
+        if (isDone() && hasFailed()) {
             action.accept(_exception);
             return this;
         }
+
+        if (isDone()) return this;
 
         _errorCallbacks.add(action);
 
@@ -107,6 +112,7 @@ public class VoidTask extends Task {
 
     @Override
     public void await() {
+        if (_isCompleted) return;
         try {
             _thread.join();
         }catch (Exception error){
@@ -116,8 +122,6 @@ public class VoidTask extends Task {
 
             _isWorking = false;
             _isCompleted = true;
-        }finally{
-            dispatch();
         }
     }
 
