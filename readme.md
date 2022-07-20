@@ -2,7 +2,7 @@
 ####  Java 1.8 library that facilitates asynchronous programming.
 
 ```xml
-<groupId>es.zaroz</groupId>
+<groupId>es.zaroz.asynctask</groupId>
 <artifactId>AsyncTask</artifactId>
 <version>1.0</version>
 ```
