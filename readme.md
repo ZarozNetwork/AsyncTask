@@ -55,3 +55,10 @@ ValueTask.run(() -> {
     System.out.println("My cat is named: " + result);
 });
 ```
+
+# About
+
+Stay @ Zaroz Network - 2022
+
+### Why does this exist? Why don't use an established library?
+We didn't want a bloated library just to use 5% of it. 
